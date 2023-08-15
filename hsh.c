@@ -1,5 +1,28 @@
 #include "pshell.h"
 
+int commands_no = 0;
+/**
+ * exec_builtin - executes buitlin command
+ * @command: function pointer to execute command
+ * Return: void
+ */
+
+void exec_builtin(char **command)
+{
+	void (*built_command)(char **);
+
+	built_command = get_builtin(command);
+	if (built_command == NULL)
+	{
+		commands_no++;
+		perror("builtin failed");
+		return;
+	}
+	commands_no++;
+	built_command(command);
+}
+
+
 /**
  * is_builtin - checks if command is a builtin command
  * @command: first token of command passed
@@ -8,12 +31,12 @@
 
 int is_builtin(char *command)
 {
-	char *builtins[] = {"cd", "env", "exit", NULL};
+	char *builtins[] = {"cd", "exit", NULL};
 	int i = 0;
 
 	for (; builtins[i] != NULL; i++)
 	{
-		if (strcmp(command, builtins[i]) == 0)
+		if (_strcmp(command, builtins[i]) == 0)
 			return (1);
 	}
 	return (0);
@@ -21,49 +44,40 @@ int is_builtin(char *command)
 
 /**
  * _prompt - prompts user for commands
- * @argv: command line
- * Return: Nothing
+ * @argv: array of parsed command
+ * Return: 0
  */
-void _prompt(char **argv)
+int _prompt(char **argv)
 {
-	char *prompt = "$ ";
 	char *command = NULL;
-	size_t n = 0, status = 0;
+	size_t n = 0;
 	ssize_t characters_read;
 	const char *delim = " \n";
 
 	/* Create a loop for the shell's prompt */
 	while (1)
 	{
-		printf("%s", prompt);
+		write(STDOUT_FILENO, PROMPT, 2);
 		characters_read = getline(&command, &n, stdin);
 		/* check if the getline function failed or reached EOF or user use CTRL + D*/
 		if (characters_read == -1)
 		{
-			printf("Exiting shell....\n");
 			break;
 		}
 		/*Tokenize command*/
 		argv = tokenize(command, delim);
 		/* execute the command */
-		if (strcmp(argv[0], "exit") == 0)
+		if (argv != NULL)
 		{
-			if (argv[1] != NULL)
-			{
-				/* converts string argument to integer status*/
-				status = atoi(argv[1]);
-				free_grid(argv);
-				break;
-			}
+			if (is_builtin(argv[0]))
+				exec_builtin(argv);
+			else
+				execut_cmd(argv);
 			free_grid(argv);
-			break;
 		}
-		else
-			execut_cmd(argv);
-		free_grid(argv);
 	}
 	free(command);
-	exit(status);
+	return (0);
 }
 
 /**
@@ -79,12 +93,7 @@ int main(int ac, char **argv)
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
-		printf("INTERACTIVE MODE\n");
 		_prompt(argv);
 	}
-	else
-	{
-		printf("Non-interractive not yet Handled\n");
-	}
-	return (0);
+	exit(0);
 }

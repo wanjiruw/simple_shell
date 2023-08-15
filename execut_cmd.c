@@ -32,4 +32,3 @@ void execut_cmd(char **full_command)
 		}
 	}
 }
-

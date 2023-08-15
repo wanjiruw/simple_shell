@@ -22,17 +22,17 @@ char *_which(char *command)
 		}
 		path_copy = strdup(path);
 
-		command_length = strlen(command);
+		command_length = _strlen(command);
 		/*tokenize path and converts to full pathname*/
 		path_token = strtok(path_copy, ":");
 		while (path_token != NULL)
 		{
-			dir_length = strlen(path_token);
+			dir_length = _strlen(path_token);
 			file_path = malloc(command_length + dir_length + 2);
-			strcpy(file_path, path_token);
-			strcat(file_path, "/");
-			strcat(file_path, command);
-			strcat(file_path, "\0");
+			_strcpy(file_path, path_token);
+			_strcat(file_path, "/");
+			_strcat(file_path, command);
+			_strcat(file_path, "\0");
 			if (stat(file_path, &buffer) == 0)
 			{
 				free(path_copy);
