@@ -89,11 +89,28 @@ int _prompt(char **argv)
 
 int main(int ac, char **argv)
 {
+	char buffer[1024];
+	memset(buffer, 0, 1024);
+	ssize_t fd;
 	(void)ac;
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
 		_prompt(argv);
+	}
+	else
+	{
+		fd = read(STDIN_FILENO, buffer, 1024);
+		if (fd == -1)
+		{
+			perror("Error!");
+		}
+		argv = tokenize(buffer, " \n");
+		if (argv == NULL)
+		{
+			perror("Error!");
+		}
+		execut_cmd(argv);
 	}
 	exit(0);
 }
