@@ -108,7 +108,7 @@ int main(int ac, char **argv)
 		argv = tokenize(buffer, " \n");
 		if (argv == NULL)
 		{
-			perror("Error!");
+			perror("Error");
 		}
 		execut_cmd(argv);
 	}
