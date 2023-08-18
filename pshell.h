@@ -10,9 +10,11 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
+#include "prints.h"
 
 /*Macros*/
 #define PROMPT "$ "
+#define DELIMITER " \t\n"
 /* Structures */
 
 /**
@@ -24,23 +26,25 @@
 typedef struct builtin_t
 {
 	char *cmd_n;
-	void (*cmd)(char **);
+	int (*cmd)(char **, int);
 } built_t;
 
 /*checks for command in the path*/
 char *_which(char *);
-void execut_cmd(char **);
+int execut_cmd(char **, int*, int);
 
 char **tokenize(char *, const char *);
+int is_builtin(char *command);
+int exec_builtin(char **command, int*, int);
 
 /*Handles allocated memory*/
 void free_grid(char **);
 char *_strtok(char *, char *);
 
 /* Prototypes for builtin functions*/
-void (*get_builtin(char **))(char **);
-void m_exit(char **);
-void _cd(char **);
+int (*get_builtin(char **))(char **, int);
+int m_exit(char **, int);
+int _cd(char **, int);
 int _isdigit(int);
 
 /*string manipulations function Prototypes*/
@@ -49,6 +53,10 @@ char *_strcpy(char *, char *);
 char *_strcat(char *, char *);
 int _strcmp(char *, char *);
 char *_strdup(char *);
+int print_integer(int num);
+int _putchar(char c);
+int _puts(char *c, int fd);
+unsigned int _strspn(char *s, char *accept);
 
 extern char **environ;
 extern int commands_no;

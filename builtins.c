@@ -6,19 +6,18 @@
  * Return: status
  */
 
-void _cd(char **dir_name)
+int _cd(char **dir_name, int command_no)
 {
 	int st;
 
-/*	if (dirname[1] == NULL)
-		st = chdir*/
 	st = chdir((const char *)dir_name[1]);
 	/* checks for permissions or existence of directory */
-	if (st != 0)
+	if (st == -1)
 	{
 		dprintf(STDERR_FILENO, "hs: %d: cd: can't cd to %s\n",
-				commands_no, dir_name[1]);
+				command_no, dir_name[1]);
 	}
+	return (errno);
 }
 
 /**
@@ -44,29 +43,40 @@ int is_number(char *string)
  * Return: Nothing
  */
 
-void m_exit(char **command)
+int m_exit(char **command, int command_no)
 {
+	char error_msg[] = "illegal number\n";
+	int exit_status = 0;
 
-	if (_strcmp(command[0], "exit") == 0)
+	if (command[1] != NULL)
 	{
-		if (command[1] != NULL)
+		/* converts string argument to integer status*/
+		if (is_number(command[1]))
 		{
-			/* converts string argument to integer status*/
-			if (is_number(command[1]))
+			exit_status = atoi(command[1]);
+			if (exit_status < 0)
 			{
-				free_grid(command);
-				exit(atoi(command[1]));
-
+				printMsg(command_no);
+				write(STDERR_FILENO, error_msg, _strlen(error_msg));
+				exit_status = 2;
+				return (exit_status);
 			}
 			else
 			{
-				perror("illegal number");
-				return;
+				free_grid(command);
+				exit(exit_status);
 			}
 		}
-		free_grid(command);
-		exit(0);
+		else
+		{
+			printMsg(command_no);
+			write(STDERR_FILENO, error_msg, _strlen(error_msg));
+			exit_status = 2;
+			return (exit_status);
+		}
 	}
+	free_grid(command);
+	exit(exit_status);
 }
 /**
  * _isdigit - checks for digit 0-9

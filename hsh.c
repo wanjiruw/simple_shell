@@ -1,25 +1,44 @@
 #include "pshell.h"
 
-int commands_no = 0;
+/**
+ * execute - starts execution based command type
+ * @command: command to execute
+ * Return: Nothing
+ */
+
+int execute(char **command, int command_no)
+{
+	int status = 0;
+
+	if (command != NULL)
+	{
+		if (is_builtin(command[0]))
+			status = exec_builtin(command, &status, command_no);
+		else
+			status = execut_cmd(command, &status, command_no);
+		free_grid(command);
+	}
+	return (status);
+}
+
 /**
  * exec_builtin - executes buitlin command
  * @command: function pointer to execute command
  * Return: void
  */
 
-void exec_builtin(char **command)
+int exec_builtin(char **command, int *status, int command_no)
 {
-	void (*built_command)(char **);
+	int (*built_command)(char **, int);
 
 	built_command = get_builtin(command);
 	if (built_command == NULL)
 	{
-		commands_no++;
 		perror("builtin failed");
-		return;
+		return (errno);
 	}
-	commands_no++;
-	built_command(command);
+	*status = built_command(command, command_no);
+	return (*status);
 }
 
 
@@ -47,12 +66,12 @@ int is_builtin(char *command)
  * @argv: array of parsed command
  * Return: 0
  */
-int _prompt(char **argv)
+int _prompt(char **argv, int *commands_no)
 {
 	char *command = NULL;
 	size_t n = 0;
 	ssize_t characters_read;
-	const char *delim = " \n";
+	int status;	
 
 	/* Create a loop for the shell's prompt */
 	while (1)
@@ -64,20 +83,17 @@ int _prompt(char **argv)
 		{
 			break;
 		}
+		if (_strlen(command) <= 1 || _strspn(command, " \t\n")
+				== (size_t)_strlen(command))
+			continue;
 		/*Tokenize command*/
-		argv = tokenize(command, delim);
+		argv = tokenize(command, DELIMITER);
 		/* execute the command */
-		if (argv != NULL)
-		{
-			if (is_builtin(argv[0]))
-				exec_builtin(argv);
-			else
-				execut_cmd(argv);
-			free_grid(argv);
-		}
+		*commands_no = *commands_no + 1;
+		status = execute(argv, *commands_no);
 	}
 	free(command);
-	return (0);
+	return (status);
 }
 
 /**
@@ -89,28 +105,30 @@ int _prompt(char **argv)
 
 int main(int ac, char **argv)
 {
-	char buffer[1024];
-	memset(buffer, 0, 1024);
-	ssize_t fd;
+	int commands_no = 0, status = 0;
+	char *buffer = NULL;
+	size_t n = 0;
 	(void)ac;
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
-		_prompt(argv);
+		_prompt(argv, &commands_no);
 	}
 	else
 	{
-		fd = read(STDIN_FILENO, buffer, 1024);
-		if (fd == -1)
+		while (getline(&buffer, &n, stdin) != -1)
 		{
-			perror("Error!");
+			if (_strlen(buffer) <= 1 || _strspn(buffer, " \t\n")
+					== (size_t)_strlen(buffer))
+				continue;
+			argv = tokenize(buffer, DELIMITER);
+			if (argv == NULL)
+			{
+				perror("tokenize failed");
+				exit(1);
+			}
+			status = execute(argv, commands_no);
 		}
-		argv = tokenize(buffer, " \n");
-		if (argv == NULL)
-		{
-			perror("Error");
-		}
-		execut_cmd(argv);
 	}
-	exit(0);
+	return (status);
 }

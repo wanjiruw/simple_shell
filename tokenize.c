@@ -12,6 +12,8 @@ char **tokenize(char *str, const char *delim)
 	char **words, *cpy, *token;
 	int i = 0, num_tokens = 0;
 
+	if (str == NULL || *str == '\0')
+		return NULL;
 	cpy = malloc(sizeof(char) * strlen(str) + 1);
 	if (cpy == NULL)
 		return (NULL);
