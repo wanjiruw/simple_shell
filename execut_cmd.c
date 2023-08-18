@@ -3,15 +3,14 @@
 /**
  * execut_cmd - executes command based on arguments passed
  * @full_command: an array of strings(command) to be executed
- * @status: operation status
+ * @program: program name
  * @command_no: command id or number for erro msg
  */
 
-int execut_cmd(char **full_command, int *status, int command_no)
+int execut_cmd(char **full_command, char *program_name, int command_no)
 {
 	pid_t child;
-	char *_command; int st;
-	*status = 0;
+	char *_command; int st, status = 0;
 
 	if (full_command != NULL)
 	{
@@ -19,10 +18,10 @@ int execut_cmd(char **full_command, int *status, int command_no)
 
 		if (_command == NULL)
 		{
-			printMsg(command_no);
-			_puts(strerror(errno), STDERR_FILENO);
-			write(STDERR_FILENO, "\n", 1);
-			return (errno);
+			printMsg(command_no, program_name);
+			_puts(full_command[0], STDERR_FILENO);
+			_puts(": not found\n", STDERR_FILENO);
+			return (127);
 		}
 		else
 		{
@@ -37,17 +36,17 @@ int execut_cmd(char **full_command, int *status, int command_no)
 				st = execve(_command, full_command, environ);
 				if (st == -1)
 				{
-					*status = errno;
-					printMsg(command_no);
+					printMsg(command_no, program_name);
 					_puts(strerror(errno), STDERR_FILENO);
 					write(STDERR_FILENO, "\n", 1);
 				}	
 			}
 			wait(&child);
+			status = errno;
 			if (_command != full_command[0])
 				free(_command);
 
 		}
 	}
-	return (*status);
+	return (status);
 }

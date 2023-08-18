@@ -3,21 +3,25 @@
 /**
  * _cd - function to change current working directory
  * @dir_name: dir name or dir path name
+ * @command_no: command id
+ * @program_name: program name
  * Return: status
  */
 
-int _cd(char **dir_name, int command_no)
+int _cd(char **dir_name, int command_no, char *program_name)
 {
+	int status = 0;
 	int st;
 
 	st = chdir((const char *)dir_name[1]);
 	/* checks for permissions or existence of directory */
 	if (st == -1)
 	{
-		dprintf(STDERR_FILENO, "hs: %d: cd: can't cd to %s\n",
-				command_no, dir_name[1]);
+		dprintf(STDERR_FILENO, "%s: %d: cd: can't cd to %s\n",
+				program_name, command_no, dir_name[1]);
+		status = errno;
 	}
-	return (errno);
+	return (status);
 }
 
 /**
@@ -43,7 +47,7 @@ int is_number(char *string)
  * Return: Nothing
  */
 
-int m_exit(char **command, int command_no)
+int m_exit(char **command, int command_no, char *program_name)
 {
 	char error_msg[] = "illegal number\n";
 	int exit_status = 0;
@@ -56,7 +60,7 @@ int m_exit(char **command, int command_no)
 			exit_status = atoi(command[1]);
 			if (exit_status < 0)
 			{
-				printMsg(command_no);
+				printMsg(command_no, program_name);
 				write(STDERR_FILENO, error_msg, _strlen(error_msg));
 				exit_status = 2;
 				return (exit_status);
@@ -69,7 +73,7 @@ int m_exit(char **command, int command_no)
 		}
 		else
 		{
-			printMsg(command_no);
+			printMsg(command_no, program_name);
 			write(STDERR_FILENO, error_msg, _strlen(error_msg));
 			exit_status = 2;
 			return (exit_status);

@@ -3,19 +3,21 @@
 /**
  * execute - starts execution based command type
  * @command: command to execute
+ * @command_no: command id
+ * @program_name: program name
  * Return: Nothing
  */
 
-int execute(char **command, int command_no)
+int execute(char **command, char *program_name, int command_no)
 {
 	int status = 0;
 
 	if (command != NULL)
 	{
 		if (is_builtin(command[0]))
-			status = exec_builtin(command, &status, command_no);
+			status = exec_builtin(command, program_name, command_no);
 		else
-			status = execut_cmd(command, &status, command_no);
+			status = execut_cmd(command, program_name, command_no);
 		free_grid(command);
 	}
 	return (status);
@@ -27,9 +29,10 @@ int execute(char **command, int command_no)
  * Return: void
  */
 
-int exec_builtin(char **command, int *status, int command_no)
+int exec_builtin(char **command, char *program_name, int command_no)
 {
-	int (*built_command)(char **, int);
+	int status = 0;
+	int (*built_command)(char **, int, char*);
 
 	built_command = get_builtin(command);
 	if (built_command == NULL)
@@ -37,8 +40,8 @@ int exec_builtin(char **command, int *status, int command_no)
 		perror("builtin failed");
 		return (errno);
 	}
-	*status = built_command(command, command_no);
-	return (*status);
+	status = built_command(command, command_no, program_name);
+	return (status);
 }
 
 
@@ -64,9 +67,11 @@ int is_builtin(char *command)
 /**
  * _prompt - prompts user for commands
  * @argv: array of parsed command
+ * @commands_no: command id
+ * @program_name: program name
  * Return: 0
  */
-int _prompt(char **argv, int *commands_no)
+int _prompt(char **argv, int *commands_no, char *program_name)
 {
 	char *command = NULL;
 	size_t n = 0;
@@ -90,7 +95,7 @@ int _prompt(char **argv, int *commands_no)
 		argv = tokenize(command, DELIMITER);
 		/* execute the command */
 		*commands_no = *commands_no + 1;
-		status = execute(argv, *commands_no);
+		status = execute(argv, program_name, *commands_no);
 	}
 	free(command);
 	return (status);
@@ -106,13 +111,13 @@ int _prompt(char **argv, int *commands_no)
 int main(int ac, char **argv)
 {
 	int commands_no = 0, status = 0;
-	char *buffer = NULL;
+	char *buffer = NULL, *program_name = argv[0];
 	size_t n = 0;
 	(void)ac;
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
-		_prompt(argv, &commands_no);
+		_prompt(argv, &commands_no, program_name);
 	}
 	else
 	{
@@ -127,7 +132,7 @@ int main(int ac, char **argv)
 				perror("tokenize failed");
 				exit(1);
 			}
-			status = execute(argv, commands_no);
+			status = execute(argv, program_name, commands_no);
 		}
 	}
 	return (status);

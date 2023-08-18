@@ -26,25 +26,25 @@
 typedef struct builtin_t
 {
 	char *cmd_n;
-	int (*cmd)(char **, int);
+	int (*cmd)(char **, int, char *);
 } built_t;
 
 /*checks for command in the path*/
 char *_which(char *);
-int execut_cmd(char **, int*, int);
+int execut_cmd(char **, char *, int);
 
 char **tokenize(char *, const char *);
 int is_builtin(char *command);
-int exec_builtin(char **command, int*, int);
+int exec_builtin(char **command, char *, int);
 
 /*Handles allocated memory*/
 void free_grid(char **);
 char *_strtok(char *, char *);
 
 /* Prototypes for builtin functions*/
-int (*get_builtin(char **))(char **, int);
-int m_exit(char **, int);
-int _cd(char **, int);
+int (*get_builtin(char **))(char **, int, char *);
+int m_exit(char **, int, char *);
+int _cd(char **, int, char *);
 int _isdigit(int);
 
 /*string manipulations function Prototypes*/

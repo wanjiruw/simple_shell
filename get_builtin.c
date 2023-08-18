@@ -6,7 +6,7 @@
  * Return: function pointer to specific function else NULL
  */
 
-int (*get_builtin(char **b_cmd))(char **, int)
+int (*get_builtin(char **b_cmd))(char **, int, char *)
 {
 	int i = 0;
 
