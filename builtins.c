@@ -2,23 +2,35 @@
 
 /**
  * _cd - function to change current working directory
- * @dir_name: dir name or dir path name
+ * @command: dir name or dir path name
  * @command_no: command id
  * @program_name: program name
  * Return: status
  */
 
-int _cd(char **dir_name, int command_no, char *program_name)
+int _cd(char **command, int command_no, char *program_name)
 {
+	char *dir_name = command[1];
 	int status = 0;
 	int st;
 
-	st = chdir((const char *)dir_name[1]);
+	if (command[1] == NULL)
+		dir_name = getenv("HOME");
+	else
+	{
+		if (_strcmp(command[1], "-") == 0)
+		{
+			dir_name = getenv("OLDPWD");
+			write(STDOUT_FILENO, dir_name, _strlen(dir_name));
+			write(STDOUT_FILENO, "\n", 1);
+		}
+		st = chdir((const char *)dir_name);
+	}
 	/* checks for permissions or existence of directory */
 	if (st == -1)
 	{
 		dprintf(STDERR_FILENO, "%s: %d: cd: can't cd to %s\n",
-				program_name, command_no, dir_name[1]);
+				program_name, command_no, dir_name);
 		status = errno;
 	}
 	return (status);
@@ -44,12 +56,14 @@ int is_number(char *string)
 /**
  * m_exit - terminates a process
  * @command: command entered at CLI
- * Return: Nothing
+ * command_no: command id
+ * program_name: executable name
+ * Return: status
  */
 
 int m_exit(char **command, int command_no, char *program_name)
 {
-	char error_msg[] = "illegal number\n";
+	char error_msg[] = "exit: Illegal number: ";
 	int exit_status = 0;
 
 	if (command[1] != NULL)
@@ -61,7 +75,10 @@ int m_exit(char **command, int command_no, char *program_name)
 			if (exit_status < 0)
 			{
 				printMsg(command_no, program_name);
-				write(STDERR_FILENO, error_msg, _strlen(error_msg));
+				write(STDERR_FILENO, error_msg,
+						_strlen(error_msg));
+				_puts(command[1], STDERR_FILENO);
+				write(STDERR_FILENO, "\n", 1);
 				exit_status = 2;
 				return (exit_status);
 			}
@@ -75,6 +92,8 @@ int m_exit(char **command, int command_no, char *program_name)
 		{
 			printMsg(command_no, program_name);
 			write(STDERR_FILENO, error_msg, _strlen(error_msg));
+			_puts(command[1], STDERR_FILENO);
+			_puts("\n", STDERR_FILENO);
 			exit_status = 2;
 			return (exit_status);
 		}
