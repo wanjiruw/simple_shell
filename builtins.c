@@ -15,12 +15,20 @@ int _cd(char **command, int command_no, char *program_name)
 	int st;
 
 	if (command[1] == NULL)
+<<<<<<< HEAD
 		dir_name = _getenv("HOME");
+=======
+		dir_name = getenv("HOME");
+>>>>>>> 0746d1f302489b1abd2ef7ad48ea07a52ab10e0e
 	else
 	{
 		if (_strcmp(command[1], "-") == 0)
 		{
+<<<<<<< HEAD
 			dir_name = _getenv("OLDPWD");
+=======
+			dir_name = getenv("OLDPWD");
+>>>>>>> 0746d1f302489b1abd2ef7ad48ea07a52ab10e0e
 			write(STDOUT_FILENO, dir_name, _strlen(dir_name));
 			write(STDOUT_FILENO, "\n", 1);
 		}
@@ -56,17 +64,26 @@ int is_number(char *string)
 /**
  * m_exit - terminates a process
  * @command: command entered at CLI
+<<<<<<< HEAD
  * @command_no: command id
  * @program_name: executable name
+=======
+ * command_no: command id
+ * program_name: executable name
+>>>>>>> 0746d1f302489b1abd2ef7ad48ea07a52ab10e0e
  * Return: status
  */
 
 int m_exit(char **command, int command_no, char *program_name)
 {
 	char error_msg[] = "exit: Illegal number: ";
+<<<<<<< HEAD
 	int exit_status;
 
 	exit_status = 0;
+=======
+	int exit_status = 0;
+>>>>>>> 0746d1f302489b1abd2ef7ad48ea07a52ab10e0e
 
 	if (command[1] != NULL)
 	{
