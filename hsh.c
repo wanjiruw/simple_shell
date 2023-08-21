@@ -26,6 +26,8 @@ int execute(char **command, char *program_name, int command_no)
 /**
  * exec_builtin - executes buitlin command
  * @command: function pointer to execute command
+ * @command_no: command id
+ * @program_name: program name
  * Return: void
  */
 
@@ -40,7 +42,10 @@ int exec_builtin(char **command, char *program_name, int command_no)
 		perror("builtin failed");
 		return (errno);
 	}
-	status = built_command(command, command_no, program_name);
+	if (strcmp(command[0], "env") == 0)
+		status = built_command(environ, command_no, command[0]);
+	else
+		status = built_command(command, command_no, program_name);
 	return (status);
 }
 
@@ -76,7 +81,7 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 	char *command = NULL;
 	size_t n = 0;
 	ssize_t characters_read;
-	int status;	
+	int status;
 
 	/* Create a loop for the shell's prompt */
 	while (1)
@@ -86,7 +91,8 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 		/* check if the getline function failed or reached EOF or user use CTRL + D*/
 		if (characters_read == -1)
 		{
-			break;
+			_puts("\n", STDOUT_FILENO);
+			return (status);
 		}
 		if (_strlen(command) <= 1 || _strspn(command, " \t\n")
 				== (size_t)_strlen(command))
@@ -132,6 +138,7 @@ int main(int ac, char **argv)
 				perror("tokenize failed");
 				exit(1);
 			}
+			commands_no++;
 			status = execute(argv, program_name, commands_no);
 		}
 	}

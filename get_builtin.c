@@ -13,7 +13,8 @@ int (*get_builtin(char **b_cmd))(char **, int, char *)
 	/* an array of function points */
 	built_t ops[] = {
 		{"cd", _cd},
-		{"exit", m_exit}
+		{"exit", m_exit},
+		{"env", _env}
 	};
 
 	while (i < 2)

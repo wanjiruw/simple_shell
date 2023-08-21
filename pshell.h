@@ -29,6 +29,7 @@ typedef struct builtin_t
 	int (*cmd)(char **, int, char *);
 } built_t;
 
+extern char **environ;
 /*checks for command in the path*/
 char *_which(char *);
 int execut_cmd(char **, char *, int);
@@ -46,6 +47,7 @@ int (*get_builtin(char **))(char **, int, char *);
 int m_exit(char **, int, char *);
 int _cd(char **, int, char *);
 int _isdigit(int);
+int _atoi(char *str);
 
 /*string manipulations function Prototypes*/
 int _strlen(char *s);
@@ -57,8 +59,12 @@ int print_integer(int num);
 int _putchar(char c);
 int _puts(char *c, int fd);
 unsigned int _strspn(char *s, char *accept);
+char *_strstr(char *haystack, char *needle);
+void join(char *, char *, char *, const char *);
 
-extern char **environ;
-extern int commands_no;
-char **standby;
+/*Environment Functions*/
+char *_getenv(char *var);
+int _env(char **, int, char *);
+int _setenv(const char *, const char *, int);
+
 #endif

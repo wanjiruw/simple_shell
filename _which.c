@@ -12,7 +12,7 @@ char *_which(char *command)
 	int command_length, dir_length;
 	struct stat buffer;
 
-	path = getenv("PATH");
+	path = _getenv("PATH");
 	if (path)
 	{
 		/*checks if command is exist*/
@@ -29,10 +29,7 @@ char *_which(char *command)
 		{
 			dir_length = _strlen(path_token);
 			file_path = malloc(command_length + dir_length + 2);
-			_strcpy(file_path, path_token);
-			_strcat(file_path, "/");
-			_strcat(file_path, command);
-			_strcat(file_path, "\0");
+			join(file_path, path_token, command, "/");
 			if (stat(file_path, &buffer) == 0)
 			{
 				free(path_copy);
