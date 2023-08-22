@@ -91,7 +91,6 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 		/* check if the getline function failed or reached EOF or user use CTRL + D*/
 		if (characters_read == -1)
 		{
-			_puts("\n", STDOUT_FILENO);
 			free(command);
 			return (status);
 		}

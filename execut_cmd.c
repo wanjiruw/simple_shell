@@ -78,7 +78,6 @@ int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name)
 		}
 		command_no++;
 		status = execute(argv, program_name, command_no);
-		free_grid(argv);
 	}
 	return (status);
 }

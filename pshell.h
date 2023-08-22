@@ -14,7 +14,7 @@
 
 /*Macros*/
 #define PROMPT "$ "
-#define DELIMITER " \t\n"
+#define DELIMITER " \n"
 /* Structures */
 
 /**
