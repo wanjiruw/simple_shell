@@ -120,28 +120,23 @@ int main(int ac, char **argv)
 	int command_no = 0, status = 0;
 	char *buffer = NULL, *program_name = argv[0];
 	size_t n = 0;
-	(void)ac;
+	FILE *stream = stdin;
+
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
-		_prompt(argv, &command_no, program_name);
+		if (ac == 2)
+		{
+			stream = (FILE *)argv[1];
+			non_interactive(&buffer, &n, stream, program_name);
+		}
+		else
+			_prompt(argv, &command_no, program_name);
 	}
+	/*checks non-interactive*/
 	else
 	{
-		while (getline(&buffer, &n, stdin) != -1)
-		{
-			if (_strlen(buffer) <= 1 || _strspn(buffer, " \t\n")
-					== (size_t)_strlen(buffer))
-				continue;
-			argv = tokenize(buffer, DELIMITER);
-			if (argv == NULL)
-			{
-				perror("tokenize failed");
-				exit(1);
-			}
-			command_no++;
-			status = execute(argv, program_name, command_no);
-		}
+		status = non_interactive(&buffer, &n, stream, program_name);
 	}
 	return (status);
 }

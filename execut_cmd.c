@@ -21,7 +21,7 @@ int execut_cmd(char **full_command, char *program_name, int command_no)
 		if (_command == NULL)
 		{
 			printMsg(command_no, program_name, full_command[0],
-			"not found\n");
+					"not found\n");
 			return (127);
 		}
 		else
@@ -49,4 +49,35 @@ int execut_cmd(char **full_command, char *program_name, int command_no)
 		}
 	}
 	return (WEXITSTATUS(status));
+}
+
+/**
+ * non_interactive - runs in the non interactive mode
+ * @buffer: buffer storing the characters read in a line stream
+ * @n: number of bytes read
+ * @file: a file to be read from
+ * @program_name: program name
+ * Return: status
+ */
+
+int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name)
+{
+	int status = 0, command_no = 0;
+	char **argv;
+
+	while (getline(buffer, n, file) != -1)
+	{
+		if (_strlen(*buffer) <= 1 || _strspn(*buffer, " \t\n")
+				== (size_t)_strlen(*buffer))
+			continue;
+		argv = tokenize(*buffer, DELIMITER);
+		if (argv == NULL)
+		{
+			perror("tokenize failed");
+			exit(1);
+		}
+		command_no++;
+		status = execute(argv, program_name, command_no);
+	}
+	return (status);
 }
