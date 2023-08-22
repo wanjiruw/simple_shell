@@ -10,7 +10,7 @@
 int _setenv(const char *name, const char *value, int overwrite)
 {
 	char *variable;
-	int len_name = _strlen((char*)name),
+	int len_name = _strlen((char *)name),
 	    len_value = _strlen((char *)value), i = 0;
 
 	variable = malloc(sizeof(char) * (len_value + len_name + 2));

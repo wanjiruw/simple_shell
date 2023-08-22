@@ -26,6 +26,8 @@ int execute(char **command, char *program_name, int command_no)
 /**
  * exec_builtin - executes buitlin command
  * @command: function pointer to execute command
+ * @program_name: executable name
+ * @command_no: command id
  * Return: void
  */
 
@@ -79,7 +81,7 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 	char *command = NULL;
 	size_t n = 0;
 	ssize_t characters_read;
-	int status;	
+	int status;
 
 	/* Create a loop for the shell's prompt */
 	while (1)
@@ -90,6 +92,7 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 		if (characters_read == -1)
 		{
 			_puts("\n", STDOUT_FILENO);
+			free(command);
 			return (status);
 		}
 		if (_strlen(command) <= 1 || _strspn(command, " \t\n")

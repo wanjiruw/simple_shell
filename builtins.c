@@ -2,7 +2,7 @@
 
 /**
  * _cd - function to change current working directory
- * @dir_name: dir name or dir path name
+ * @command: dir name or dir path name
  * @command_no: command id
  * @program_name: program name
  * Return: status
@@ -31,7 +31,7 @@ int _cd(char **command, int command_no, char *program_name)
 	if (st == -1)
 	{
 		dprintf(STDERR_FILENO, "%s: %d: cd: can't cd to %s\n",
-				program_name, command_no, dir_name[1]);
+				program_name, command_no, dir_name);
 		status = errno;
 	}
 	return (status);
