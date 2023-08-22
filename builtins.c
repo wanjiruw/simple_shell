@@ -64,7 +64,7 @@ int is_number(char *string)
 
 int m_exit(char **command, int command_no, char *program_name)
 {
-	char error_msg[] = "illegal number\n";
+	char error_msg[] = "illegal number ";
 	int exit_status = 0;
 
 	if (command[1] != NULL)
@@ -75,8 +75,9 @@ int m_exit(char **command, int command_no, char *program_name)
 			exit_status = _atoi(command[1]);
 			if (exit_status < 0)
 			{
-				printMsg(command_no, program_name);
-				write(STDERR_FILENO, error_msg, _strlen(error_msg));
+				printMsg(command_no, program_name, command[0], error_msg);
+				_puts(command[1], STDERR_FILENO);
+				_puts("\n", STDERR_FILENO);
 				exit_status = 2;
 				return (exit_status);
 			}
@@ -88,8 +89,9 @@ int m_exit(char **command, int command_no, char *program_name)
 		}
 		else
 		{
-			printMsg(command_no, program_name);
-			write(STDERR_FILENO, error_msg, _strlen(error_msg));
+			printMsg(command_no, program_name, command[0], error_msg);
+			_puts(command[1], STDERR_FILENO);
+			_puts("\n", STDERR_FILENO);
 			exit_status = 2;
 			return (exit_status);
 		}

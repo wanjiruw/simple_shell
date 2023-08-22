@@ -20,9 +20,8 @@ int execut_cmd(char **full_command, char *program_name, int command_no)
 
 		if (_command == NULL)
 		{
-			printMsg(command_no, program_name);
-			_puts(full_command[0], STDERR_FILENO);
-			_puts(": not found\n", STDERR_FILENO);
+			printMsg(command_no, program_name, full_command[0],
+			"not found\n");
 			return (127);
 		}
 		else
@@ -38,9 +37,7 @@ int execut_cmd(char **full_command, char *program_name, int command_no)
 				st = execve(_command, full_command, environ);
 				if (st == -1)
 				{
-					printMsg(command_no, program_name);
-					_puts(strerror(errno), STDERR_FILENO);
-					write(STDERR_FILENO, "\n", 1);
+					printMsg(command_no, program_name, full_command[0], strerror(errno));
 				}
 			}
 			else

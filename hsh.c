@@ -117,14 +117,14 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 
 int main(int ac, char **argv)
 {
-	int commands_no = 0, status = 0;
+	int command_no = 0, status = 0;
 	char *buffer = NULL, *program_name = argv[0];
 	size_t n = 0;
 	(void)ac;
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
-		_prompt(argv, &commands_no, program_name);
+		_prompt(argv, &command_no, program_name);
 	}
 	else
 	{
@@ -139,7 +139,8 @@ int main(int ac, char **argv)
 				perror("tokenize failed");
 				exit(1);
 			}
-			status = execute(argv, program_name, commands_no);
+			command_no++;
+			status = execute(argv, program_name, command_no);
 		}
 	}
 	return (status);

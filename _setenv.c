@@ -5,6 +5,7 @@
  * @name: variable name
  * @value: variable value
  * @overwrite: overwriting option
+ * Return: 0 on success else 1
  */
 
 int _setenv(const char *name, const char *value, int overwrite)
