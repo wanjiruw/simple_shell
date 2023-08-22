@@ -26,8 +26,6 @@ int execute(char **command, char *program_name, int command_no)
 /**
  * exec_builtin - executes buitlin command
  * @command: function pointer to execute command
- * @command_no: command id
- * @program_name: program name
  * Return: void
  */
 
@@ -81,7 +79,7 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 	char *command = NULL;
 	size_t n = 0;
 	ssize_t characters_read;
-	int status;
+	int status;	
 
 	/* Create a loop for the shell's prompt */
 	while (1)
@@ -138,7 +136,6 @@ int main(int ac, char **argv)
 				perror("tokenize failed");
 				exit(1);
 			}
-			commands_no++;
 			status = execute(argv, program_name, commands_no);
 		}
 	}
