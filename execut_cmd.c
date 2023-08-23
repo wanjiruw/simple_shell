@@ -5,10 +5,11 @@
  * @full_command: an array of strings(command) to be executed
  * @program_name: program name
  * @command_no: command id or number for erro msg
+ * @envp: environment variable
  * Return: status
  */
 
-int execut_cmd(char **full_command, char *program_name, int command_no)
+int execut_cmd(char **full_command, char *program_name, int command_no, char **envp)
 {
 	pid_t child;
 	char *_command;
@@ -34,7 +35,7 @@ int execut_cmd(char **full_command, char *program_name, int command_no)
 			}
 			if (child == 0)
 			{
-				st = execve(_command, full_command, environ);
+				st = execve(_command, full_command, envp);
 				if (st == -1)
 				{
 					printMsg(command_no, program_name, full_command[0], strerror(errno));
@@ -57,10 +58,11 @@ int execut_cmd(char **full_command, char *program_name, int command_no)
  * @n: number of bytes read
  * @file: a file to be read from
  * @program_name: program name
+ * @envp: environment variables
  * Return: status
  */
 
-int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name)
+int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name, char **envp)
 {
 	int status = 0, command_no = 0;
 	char **argv;
@@ -77,7 +79,7 @@ int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name)
 			exit(1);
 		}
 		command_no++;
-		status = execute(argv, program_name, command_no);
+		status = execute(argv, program_name, command_no, envp);
 	}
 	return (status);
 }

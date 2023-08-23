@@ -32,11 +32,11 @@ typedef struct builtin_t
 extern char **environ;
 /*checks for command in the path*/
 char *_which(char *);
-int execut_cmd(char **, char *, int);
+int execut_cmd(char **, char *, int, char **);
 
 char **tokenize(char *, const char *);
 int is_builtin(char *command);
-int exec_builtin(char **command, char *, int);
+int exec_builtin(char **command, char *, int, char **);
 
 /*Handles allocated memory*/
 void free_grid(char **);
@@ -66,6 +66,6 @@ void join(char *, char *, char *, const char *);
 char *_getenv(char *var);
 int _env(char **, int, char *);
 int _setenv(const char *, const char *, int);
-int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name);
-int execute(char **command, char *program_name, int command_no);
+int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name, char **);
+int execute(char **command, char *program_name, int command_no, char **);
 #endif

@@ -5,19 +5,20 @@
  * @command: command to execute
  * @command_no: command id
  * @program_name: program name
+ * @envp: environment variables
  * Return: Nothing
  */
 
-int execute(char **command, char *program_name, int command_no)
+int execute(char **command, char *program_name, int command_no, char **envp)
 {
 	int status = 0;
 
 	if (command != NULL)
 	{
 		if (is_builtin(command[0]))
-			status = exec_builtin(command, program_name, command_no);
+			status = exec_builtin(command, program_name, command_no, envp);
 		else
-			status = execut_cmd(command, program_name, command_no);
+			status = execut_cmd(command, program_name, command_no, envp);
 		free_grid(command);
 	}
 	return (status);
@@ -31,7 +32,7 @@ int execute(char **command, char *program_name, int command_no)
  * Return: void
  */
 
-int exec_builtin(char **command, char *program_name, int command_no)
+int exec_builtin(char **command, char *program_name, int command_no, char **envp)
 {
 	int status = 0;
 	int (*built_command)(char **, int, char*);
@@ -43,7 +44,7 @@ int exec_builtin(char **command, char *program_name, int command_no)
 		return (errno);
 	}
 	if (strcmp(command[0], "env") == 0)
-		status = built_command(environ, command_no, command[0]);
+		status = built_command(envp, command_no, command[0]);
 	else
 		status = built_command(command, command_no, program_name);
 	return (status);
@@ -74,9 +75,10 @@ int is_builtin(char *command)
  * @argv: array of parsed command
  * @commands_no: command id
  * @program_name: program name
+ * @envp: environment variables
  * Return: 0
  */
-int _prompt(char **argv, int *commands_no, char *program_name)
+int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 {
 	char *command = NULL;
 	size_t n = 0;
@@ -102,7 +104,7 @@ int _prompt(char **argv, int *commands_no, char *program_name)
 		argv = tokenize(command, DELIMITER);
 		/* execute the command */
 		*commands_no = *commands_no + 1;
-		status = execute(argv, program_name, *commands_no);
+		status = execute(argv, program_name, *commands_no, envp);
 	}
 	free(command);
 	return (status);
@@ -115,7 +117,7 @@ int _prompt(char **argv, int *commands_no, char *program_name)
  * Return: 0 on success
  */
 
-int main(int ac, char **argv)
+int main(int ac, char **argv, char **envp)
 {
 	int command_no = 0, status = 0;
 	char *buffer = NULL, *program_name = argv[0];
@@ -128,15 +130,15 @@ int main(int ac, char **argv)
 		if (ac == 2)
 		{
 			stream = (FILE *)argv[1];
-			non_interactive(&buffer, &n, stream, program_name);
+			non_interactive(&buffer, &n, stream, program_name, envp);
 		}
 		else
-			_prompt(argv, &command_no, program_name);
+			_prompt(argv, &command_no, program_name, envp);
 	}
 	/*checks non-interactive*/
 	else
 	{
-		status = non_interactive(&buffer, &n, stream, program_name);
+		status = non_interactive(&buffer, &n, stream, program_name, envp);
 	}
 	return (status);
 }
