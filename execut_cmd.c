@@ -2,26 +2,26 @@
 
 /**
  * execut_cmd - executes command based on arguments passed
- * @full_command: an array of strings(command) to be executed
+ * @full_cmd: an array of strings(command) to be executed
  * @program_name: program name
- * @command_no: command id or number for erro msg
+ * @cmd_no: command id or number for erro msg
  * @envp: environment variable
  * Return: status
  */
 
-int execut_cmd(char **full_command, char *program_name, int command_no, char **envp)
+int execut_cmd(char **full_cmd, char *program_name, int cmd_no, char **envp)
 {
 	pid_t child;
 	char *_command;
 	int st, status = 0;
 
-	if (full_command != NULL)
+	if (full_cmd != NULL)
 	{
-		_command = _which(full_command[0]);
+		_command = _which(full_cmd[0]);
 
 		if (_command == NULL)
 		{
-			printMsg(command_no, program_name, full_command[0],
+			printMsg(cmd_no, program_name, full_cmd[0],
 					"not found\n");
 			return (127);
 		}
@@ -35,16 +35,16 @@ int execut_cmd(char **full_command, char *program_name, int command_no, char **e
 			}
 			if (child == 0)
 			{
-				st = execve(_command, full_command, envp);
+				st = execve(_command, full_cmd, envp);
 				if (st == -1)
 				{
-					printMsg(command_no, program_name, full_command[0], strerror(errno));
+					printMsg(cmd_no, program_name, full_cmd[0], strerror(errno));
 				}
 			}
 			else
 			{
 				wait(&status);
-				if (_command != full_command[0])
+				if (_command != full_cmd[0])
 					free(_command);
 			}
 		}
@@ -62,7 +62,8 @@ int execut_cmd(char **full_command, char *program_name, int command_no, char **e
  * Return: status
  */
 
-int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name, char **envp)
+int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name,
+		char **envp)
 {
 	int status = 0, command_no = 0;
 	char **argv;

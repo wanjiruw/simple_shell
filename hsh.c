@@ -3,22 +3,23 @@
 /**
  * execute - starts execution based command type
  * @command: command to execute
- * @command_no: command id
+ * @cmd_no: command id
  * @program_name: program name
  * @envp: environment variables
  * Return: Nothing
  */
 
-int execute(char **command, char *program_name, int command_no, char **envp)
+int execute(char **command, char *program_name, int cmd_no,
+		char **envp)
 {
 	int status = 0;
 
 	if (command != NULL)
 	{
 		if (is_builtin(command[0]))
-			status = exec_builtin(command, program_name, command_no, envp);
+			status = exec_builtin(command, program_name, cmd_no, envp);
 		else
-			status = execut_cmd(command, program_name, command_no, envp);
+			status = execut_cmd(command, program_name, cmd_no, envp);
 		free_grid(command);
 	}
 	return (status);
@@ -29,10 +30,12 @@ int execute(char **command, char *program_name, int command_no, char **envp)
  * @command: function pointer to execute command
  * @program_name: executable name
  * @command_no: command id
+ * @envp: environment variable
  * Return: void
  */
 
-int exec_builtin(char **command, char *program_name, int command_no, char **envp)
+int exec_builtin(char **command, char *program_name, int command_no,
+		char **envp)
 {
 	int status = 0;
 	int (*built_command)(char **, int, char*);
@@ -113,6 +116,7 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
  * main - entry point
  * @ac: number of command line arguments
  * @argv: array of arguments
+ * @envp: environment variable
  * Return: 0 on success
  */
 
