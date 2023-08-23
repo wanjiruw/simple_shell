@@ -94,8 +94,7 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 		if (characters_read == -1)
 		{
 			/*_puts("\n", STDOUT_FILENO);*/
-			free(command);
-			return (status);
+			break;
 		}
 		if (_strlen(command) <= 1 || _strspn(command, " \t\n")
 				== (size_t)_strlen(command))
@@ -133,7 +132,7 @@ int main(int ac, char **argv, char **envp)
 			non_interactive(&buffer, &n, stream, program_name, envp);
 		}
 		else
-			_prompt(argv, &command_no, program_name, envp);
+			status = _prompt(argv, &command_no, program_name, envp);
 	}
 	/*checks non-interactive*/
 	else
