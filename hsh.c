@@ -96,11 +96,10 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 		/* check if the getline function failed or reached EOF or user use CTRL + D*/
 		if (characters_read == -1)
 		{
-			/*_puts("\n", STDOUT_FILENO);*/
 			break;
 		}
 		if (_strlen(command) <= 1 || _strspn(command, " \t\n")
-				== (size_t)_strlen(command))
+				== (size_t)_strlen(command) || command[0] == '#')
 			continue;
 		/*Tokenize command*/
 		argv = tokenize(command, DELIMITER);

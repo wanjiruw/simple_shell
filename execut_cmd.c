@@ -71,7 +71,7 @@ int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name,
 	while (getline(buffer, n, file) != -1)
 	{
 		if (_strlen(*buffer) <= 1 || _strspn(*buffer, " \t\n")
-				== (size_t)_strlen(*buffer))
+				== (size_t)_strlen(*buffer) || *(buffer[0]) == '#')
 			continue;
 		argv = tokenize(*buffer, DELIMITER);
 		if (argv == NULL)
