@@ -66,6 +66,6 @@ void join(char *, char *, char *, const char *);
 char *_getenv(char *var);
 int _env(char **, int, char *);
 int _setenv(const char *, const char *, int);
-int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name, char **);
+int non_interactive(char **buffer, size_t *n, FILE *file, char *, char **);
 int execute(char **command, char *program_name, int command_no, char **);
 #endif
