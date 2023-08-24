@@ -86,7 +86,7 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 	char *command = NULL;
 	size_t n = 0;
 	ssize_t characters_read;
-	int status;
+	int status = 0;
 
 	/* Create a loop for the shell's prompt */
 	while (1)

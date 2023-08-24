@@ -68,7 +68,7 @@ int is_number(char *string)
 
 int m_exit(char **command, int command_no, char *program_name)
 {
-	char error_msg[] = "illegal number ";
+	char error_msg[] = "illegal number: ";
 	int exit_status = 0;
 
 	if (command[1] != NULL)
