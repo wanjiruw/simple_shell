@@ -82,8 +82,7 @@ int m_exit(char **command, int command_no, char *program_name)
 				printMsg(command_no, program_name, command[0], error_msg);
 				_puts(command[1], STDERR_FILENO);
 				_puts("\n", STDERR_FILENO);
-				exit_status = 2;
-				return (exit_status);
+				return (2);
 			}
 			else
 			{
@@ -96,8 +95,7 @@ int m_exit(char **command, int command_no, char *program_name)
 			printMsg(command_no, program_name, command[0], error_msg);
 			_puts(command[1], STDERR_FILENO);
 			_puts("\n", STDERR_FILENO);
-			exit_status = 2;
-			return (exit_status);
+			return (2);
 		}
 	}
 	free_grid(command);
