@@ -13,6 +13,7 @@ int _cd(char **command, int command_no, char *program_name)
 	int status = 0;
 	int st;
 	char *dir_name = command[1];
+	char buff[1024];
 
 	if (dir_name == NULL)
 		dir_name = _getenv("HOME");
@@ -21,6 +22,7 @@ int _cd(char **command, int command_no, char *program_name)
 		if (_strcmp(command[1], "-") == 0)
 		{
 			dir_name = _getenv("OLDPWD");
+			setenv("OLDPWD", (const char *)getcwd(buff, 1024), 1);
 			write(STDOUT_FILENO, dir_name, _strlen(dir_name));
 			write(STDOUT_FILENO, "\n", 1);
 		}
@@ -33,7 +35,9 @@ int _cd(char **command, int command_no, char *program_name)
 		dprintf(STDERR_FILENO, "%s: %d: cd: can't cd to %s\n",
 				program_name, command_no, dir_name);
 		status = errno;
+		return (status);
 	}
+	setenv("PWD", dir_name, 1);
 	return (status);
 }
 
@@ -115,4 +119,3 @@ int _isdigit(int c)
 		result = 0;
 	return (result);
 }
-

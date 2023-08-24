@@ -44,7 +44,7 @@ int exec_builtin(char **command, char *program_name, int command_no,
 	if (built_command == NULL)
 	{
 		perror("builtin failed");
-		return (errno);
+		return (127);
 	}
 	if (strcmp(command[0], "env") == 0)
 		status = built_command(envp, command_no, command[0]);
@@ -62,7 +62,7 @@ int exec_builtin(char **command, char *program_name, int command_no,
 
 int is_builtin(char *command)
 {
-	char *builtins[] = {"cd", "exit", NULL};
+	char *builtins[] = {"cd", "exit", "env", NULL};
 	int i = 0;
 
 	for (; builtins[i] != NULL; i++)
@@ -117,7 +117,7 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
  * @ac: number of command line arguments
  * @argv: array of arguments
  * @envp: environment variable
- * Return: 0 on success
+ * Return: 0 on success otherwise failure status
  */
 
 int main(int ac, char **argv, char **envp)

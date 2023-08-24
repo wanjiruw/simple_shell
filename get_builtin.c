@@ -17,7 +17,7 @@ int (*get_builtin(char **b_cmd))(char **, int, char *)
 		{"env", _env}
 	};
 
-	while (i < 2)
+	while (i < 3)
 	{
 		if (strcmp(b_cmd[0], ops[i].cmd_n) == 0)
 		{
