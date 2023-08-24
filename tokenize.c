@@ -34,6 +34,8 @@ char **tokenize(char *str, const char *delim)
 	token = strtok(cpy, delim);
 	while (token != NULL)
 	{
+		if (token[0] == '#')
+			break;
 		words[i] = malloc(sizeof(char) * strlen(token) + 1);
 		strcpy(words[i], token);
 		token = strtok(NULL, delim);
