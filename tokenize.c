@@ -22,6 +22,8 @@ char **tokenize(char *str, const char *delim)
 
 	while (token != NULL)
 	{
+		if (token[0] == '#')
+			break;
 		num_tokens++;
 		token = strtok(NULL, delim);
 	}
