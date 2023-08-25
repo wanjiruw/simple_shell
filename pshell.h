@@ -10,28 +10,11 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
+#include "prints.h"
 
 /*Macros*/
 #define PROMPT "$ "
 #define DELIMITER " \n"
-
-/**
- * struct command_var - this is a struct for command variables
- * @program_name: executable name
- * @cmd_no: command number or ID
- * @status: programs status
- * @env: environment variables
- */
-
-typedef struct command_var
-{
-	char *program_name;
-	int cmd_no;
-	int status;
-	char **command;
-	char **env;
-} cmd_t;
-
 /* Structures */
 
 /**
@@ -43,27 +26,26 @@ typedef struct command_var
 typedef struct builtin_t
 {
 	char *cmd_n;
-	void (*cmd)(cmd_t);
+	int (*cmd)(char **, int, char *);
 } built_t;
 
-#include "prints.h"
 extern char **environ;
 /*checks for command in the path*/
 char *_which(char *);
-void execut_cmd(cmd_t cmd_info);
+int execut_cmd(char **, char *, int, char **);
 
 char **tokenize(char *, const char *);
 int is_builtin(char *command);
-void exec_builtin(cmd_t cmd_info);
+int exec_builtin(char **command, char *, int, char **);
 
 /*Handles allocated memory*/
 void free_grid(char **);
 char *_strtok(char *, char *);
 
 /* Prototypes for builtin functions*/
-void (*get_builtin(char **))(cmd_t cmd_info);
-void m_exit(cmd_t cmd_info);
-void _cd(cmd_t cmd_info);
+int (*get_builtin(char **))(char **, int, char *);
+int m_exit(char **, int, char *);
+int _cd(char **, int, char *);
 int _isdigit(int);
 int _atoi(char *str);
 
@@ -82,8 +64,8 @@ void join(char *, char *, char *, const char *);
 
 /*Environment Functions*/
 char *_getenv(char *var);
-void _env(cmd_t);
+int _env(char **, int, char *);
 int _setenv(const char *, const char *, int);
-int non_interactive(char **buffer, size_t *n, FILE *file, cmd_t);
-void execute(cmd_t);
+int non_interactive(char **buffer, size_t *n, FILE *file, char *, char **);
+int execute(char **command, char *program_name, int command_no, char **);
 #endif

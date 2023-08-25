@@ -28,20 +28,26 @@ char *_getenv(char *var)
 
 /**
  * _env - prints the environment variables of an environment
- * @cmd_info: bunch of variables
+ * @command: command to be executed
+ * @enVar: environment variables
+ * @command_no: command ID
  * Return: returns exit_status
  */
 
-void _env(cmd_t cmd_info)
+int _env(char **enVar, int command_no, char *command)
 {
 	int i = 0;
 
-	while (cmd_info.env[i])
+	(void)command_no;
+
+	while (enVar[i])
 	{
-		write(STDOUT_FILENO, cmd_info.env[i], _strlen(cmd_info.env[i]));
+		write(STDOUT_FILENO, enVar[i], _strlen(enVar[i]));
 		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}
-	cmd_info.status = 0;
 
+	if (command == NULL)
+		return (2);
+	return (0);
 }

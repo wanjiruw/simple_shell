@@ -2,21 +2,24 @@
 
 /**
  * _cd - function to change current working directory
- * @cmd_info: strcut of command varibles
+ * @command: dir name or dir path name
+ * @command_no: command id
+ * @program_name: program name
  * Return: status
  */
 
-void _cd(cmd_t cmd_info)
+int _cd(char **command, int command_no, char *program_name)
 {
+	int status = 0;
 	int st;
-	char *dir_name = cmd_info.command[1];
+	char *dir_name = command[1];
 	char buff[1024];
 
 	if (dir_name == NULL)
 		dir_name = _getenv("HOME");
 	else
 	{
-		if (_strcmp(cmd_info.command[1], "-") == 0)
+		if (_strcmp(command[1], "-") == 0)
 		{
 			dir_name = _getenv("OLDPWD");
 			setenv("OLDPWD", (const char *)getcwd(buff, 1024), 1);
@@ -24,19 +27,18 @@ void _cd(cmd_t cmd_info)
 			write(STDOUT_FILENO, "\n", 1);
 		}
 		st = chdir((const char *)dir_name);
-		return;
 	}
 	st = chdir((const char *)dir_name);
 	/* checks for permissions or existence of directory */
 	if (st == -1)
 	{
 		dprintf(STDERR_FILENO, "%s: %d: cd: can't cd to %s\n",
-		cmd_info.program_name, cmd_info.cmd_no, dir_name);
-		cmd_info.status = errno;
-		return;
+				program_name, command_no, dir_name);
+		status = errno;
+		return (status);
 	}
 	setenv("PWD", dir_name, 1);
-	cmd_info.status = errno;
+	return (status);
 }
 
 /**
@@ -58,43 +60,45 @@ int is_number(char *string)
 
 /**
  * m_exit - terminates a process
- * @cmd_info: struct of command variables
- * Return: Nothing
+ * @command: command entered at CLI
+ * @command_no: command id
+ * @program_name: executable name
+ * Return: status
  */
 
-void m_exit(cmd_t cmd_info)
+int m_exit(char **command, int command_no, char *program_name)
 {
-	char error_msg[] = "Illegal number: ";
-	int exit_status = cmd_info.status;
+	char error_msg[] = "illegal number: ";
+	int exit_status = 0;
 
-	if (cmd_info.command[1] != NULL)
+	if (command[1] != NULL)
 	{
 		/* converts string argument to integer status*/
-		if (is_number(cmd_info.command[1]))
+		if (is_number(command[1]))
 		{
-			exit_status = _atoi(cmd_info.command[1]);
+			exit_status = _atoi(command[1]);
 			if (exit_status < 0)
 			{
-				printMsg(cmd_info, error_msg);
-				_puts(cmd_info.command[1], STDERR_FILENO);
+				printMsg(command_no, program_name, command[0], error_msg);
+				_puts(command[1], STDERR_FILENO);
 				_puts("\n", STDERR_FILENO);
-				exit(2);
+				return (2);
 			}
 			else
 			{
-				free_grid(cmd_info.command);
+				free_grid(command);
 				exit(exit_status);
 			}
 		}
 		else
 		{
-			printMsg(cmd_info, error_msg);
-			_puts(cmd_info.command[1], STDERR_FILENO);
+			printMsg(command_no, program_name, command[0], error_msg);
+			_puts(command[1], STDERR_FILENO);
 			_puts("\n", STDERR_FILENO);
-			exit(2);
+			return (2);
 		}
 	}
-	free_grid(cmd_info.command);
+	free_grid(command);
 	exit(exit_status);
 }
 /**
