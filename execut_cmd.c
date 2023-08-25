@@ -2,28 +2,25 @@
 
 /**
  * execut_cmd - executes command based on arguments passed
- * @full_cmd: an array of strings(command) to be executed
- * @program_name: program name
- * @cmd_no: command id or number for erro msg
- * @envp: environment variable
+ * @cmd_info: struct of variables
  * Return: status
  */
 
-int execut_cmd(char **full_cmd, char *program_name, int cmd_no, char **envp)
+void execut_cmd(cmd_t cmd_info)
 {
 	pid_t child;
 	char *_command;
 	int st, status = 0;
 
-	if (full_cmd != NULL)
+	if (cmd_info.command != NULL)
 	{
-		_command = _which(full_cmd[0]);
+		_command = _which(cmd_info.command[0]);
 
 		if (_command == NULL)
 		{
-			printMsg(cmd_no, program_name, full_cmd[0],
-					"not found\n");
-			return (127);
+			printMsg(cmd_info, "not found\n");
+			cmd_info.status = 127;
+			return;
 		}
 		else
 		{
@@ -31,25 +28,26 @@ int execut_cmd(char **full_cmd, char *program_name, int cmd_no, char **envp)
 			if (child == -1)
 			{
 				perror("Child process failed\n");
-				return (errno);
+				return;
 			}
 			if (child == 0)
 			{
-				st = execve(_command, full_cmd, envp);
+				st = execve(_command, cmd_info.command, cmd_info.env);
 				if (st == -1)
 				{
-					printMsg(cmd_no, program_name, full_cmd[0], strerror(errno));
+					printMsg(cmd_info, strerror(errno));
+					return;
 				}
 			}
 			else
 			{
 				wait(&status);
-				if (_command != full_cmd[0])
+				if (_command != cmd_info.command[0])
 					free(_command);
 			}
 		}
 	}
-	return (WEXITSTATUS(status));
+	cmd_info.status = WEXITSTATUS(status);
 }
 
 /**
@@ -57,15 +55,13 @@ int execut_cmd(char **full_cmd, char *program_name, int cmd_no, char **envp)
  * @buffer: buffer storing the characters read in a line stream
  * @n: number of bytes read
  * @file: a file to be read from
- * @program_name: program name
- * @envp: environment variables
+ * @cmd_info: a struct of command varibles
  * Return: status
  */
 
-int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name,
-		char **envp)
+int non_interactive(char **buffer, size_t *n, FILE *file, cmd_t cmd_info)
 {
-	int status = 0, command_no = 0;
+	int status = 0;
 	char **argv;
 
 	while (getline(buffer, n, file) != -1)
@@ -79,8 +75,8 @@ int non_interactive(char **buffer, size_t *n, FILE *file, char *program_name,
 			perror("tokenize failed");
 			exit(1);
 		}
-		command_no++;
-		status = execute(argv, program_name, command_no, envp);
+		cmd_info.cmd_no += 1;
+		execute(cmd_info);
 	}
 	free(*buffer);
 	return (status);

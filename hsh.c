@@ -2,55 +2,41 @@
 
 /**
  * execute - starts execution based command type
- * @command: command to execute
- * @cmd_no: command id
- * @program_name: program name
- * @envp: environment variables
+ * @cmd_info: struct of variables
  * Return: Nothing
  */
 
-int execute(char **command, char *program_name, int cmd_no,
-		char **envp)
+void execute(cmd_t cmd_info)
 {
-	int status = 0;
 
-	if (command != NULL)
+	if (cmd_info.command != NULL)
 	{
-		if (is_builtin(command[0]))
-			status = exec_builtin(command, program_name, cmd_no, envp);
+		if (is_builtin(cmd_info.command[0]))
+			exec_builtin(cmd_info);
 		else
-			status = execut_cmd(command, program_name, cmd_no, envp);
-		free_grid(command);
+			execut_cmd(cmd_info);
+		free_grid(cmd_info.command);
 	}
-	return (status);
 }
 
 /**
  * exec_builtin - executes buitlin command
- * @command: function pointer to execute command
- * @program_name: executable name
- * @command_no: command id
- * @envp: environment variable
+ * @cmd_info: struct of variables
  * Return: void
  */
 
-int exec_builtin(char **command, char *program_name, int command_no,
-		char **envp)
+void exec_builtin(cmd_t cmd_info)
 {
-	int status = 0;
-	int (*built_command)(char **, int, char*);
+	void (*built_command)(cmd_t);
 
-	built_command = get_builtin(command);
+	built_command = get_builtin(cmd_info.command);
 	if (built_command == NULL)
 	{
 		perror("builtin failed");
-		return (127);
+		cmd_info.status = 127;
+		return;
 	}
-	if (strcmp(command[0], "env") == 0)
-		status = built_command(envp, command_no, command[0]);
-	else
-		status = built_command(command, command_no, program_name);
-	return (status);
+	built_command(cmd_info);
 }
 
 
@@ -75,18 +61,14 @@ int is_builtin(char *command)
 
 /**
  * _prompt - prompts user for commands
- * @argv: array of parsed command
- * @commands_no: command id
- * @program_name: program name
- * @envp: environment variables
- * Return: 0
+ * @cmd_info: struct of command variables
+ * Return: NOTHING
  */
-int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
+void _prompt(cmd_t cmd_info)
 {
 	char *command = NULL;
 	size_t n = 0;
 	ssize_t characters_read;
-	int status = 0;
 
 	/* Create a loop for the shell's prompt */
 	while (1)
@@ -102,13 +84,11 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 				== (size_t)_strlen(command) || command[0] == '#')
 			continue;
 		/*Tokenize command*/
-		argv = tokenize(command, DELIMITER);
+		cmd_info.command = tokenize(command, DELIMITER);
 		/* execute the command */
-		*commands_no = *commands_no + 1;
-		status = execute(argv, program_name, *commands_no, envp);
+		cmd_info.cmd_no += 1;
 	}
 	free(command);
-	return (status);
 }
 
 /**
@@ -121,26 +101,27 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 
 int main(int ac, char **argv, char **envp)
 {
-	int command_no = 0, status = 0;
-	char *buffer = NULL, *program_name = argv[0];
+	char *buffer = NULL;
+	cmd_t cmd_info = {0};
 	size_t n = 0;
 	FILE *stream = stdin;
 
+	cmd_info.program_name = argv[0];
+	cmd_info.env = envp;
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
 		if (ac == 2)
 		{
-			stream = (FILE *)argv[1];
-			non_interactive(&buffer, &n, stream, program_name, envp);
+			non_interactive(&buffer, &n, stream, cmd_info);
 		}
 		else
-			status = _prompt(argv, &command_no, program_name, envp);
+			_prompt(cmd_info);
 	}
 	/*checks non-interactive*/
 	else
 	{
-		status = non_interactive(&buffer, &n, stream, program_name, envp);
+		non_interactive(&buffer, &n, stream, cmd_info);
 	}
-	return (status);
+	return (cmd_info.status);
 }

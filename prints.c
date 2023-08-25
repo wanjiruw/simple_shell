@@ -63,18 +63,16 @@ int _putchar(char c)
 
 /**
  * printMsg - prints error message
- * @command_no: command id
- * @program_name: executable name
- * @command: command entered
+ * @cmd_info: struct of command variables
  * @error_: error message
  */
-void printMsg(int command_no, char *program_name, char *command, char *error_)
+void printMsg(cmd_t cmd_info, char *error_)
 {
-	_puts(program_name, STDERR_FILENO);
+	_puts(cmd_info.program_name, STDERR_FILENO);
 	_puts(": ", STDERR_FILENO);
-	print_integer(command_no);
+	print_integer(cmd_info.cmd_no);
 	_puts(": ", STDERR_FILENO);
-	_puts(command, STDERR_FILENO);
+	_puts(cmd_info.command[0], STDERR_FILENO);
 	_puts(": ", STDERR_FILENO);
 	_puts(error_, STDERR_FILENO);
 }
