@@ -2,54 +2,42 @@
 
 /**
  * execute - starts execution based command type
- * @command: command to execute
- * @cmd_no: command id
- * @program_name: program name
- * @envp: environment variables
+ * @cmd_var: command variables
  * Return: Nothing
  */
 
-int execute(char **command, char *program_name, int cmd_no,
-		char **envp)
+int execute(cmd_t cmd_var)
 {
-	int status = 0;
+	int status = 0; /**DON'T FORGET TO COME BACK*/
 
-	if (command != NULL)
-	{
-		if (is_builtin(command[0]))
-			status = exec_builtin(command, program_name, cmd_no, envp);
-		else
-			status = execut_cmd(command, program_name, cmd_no, envp);
-		free_grid(command);
-	}
+	if (is_builtin(cmd_var.cmd[0]))
+		status = exec_builtin(cmd_var);
+	else
+		status = execut_cmd(cmd_var);
+	free_grid(cmd_var.cmd);
 	return (status);
 }
 
 /**
  * exec_builtin - executes buitlin command
- * @command: function pointer to execute command
- * @program_name: executable name
- * @command_no: command id
- * @envp: environment variable
+ * @cmd_var: command variables
  * Return: void
  */
 
-int exec_builtin(char **command, char *program_name, int command_no,
-		char **envp)
+int exec_builtin(cmd_t cmd_var)
 {
 	int status = 0;
-	int (*built_command)(char **, int, char*);
+	int (*built_command)(cmd_t cmd_var);
 
-	built_command = get_builtin(command);
+	built_command = get_builtin(cmd_var.cmd);
 	if (built_command == NULL)
 	{
 		perror("builtin failed");
+		cmd_var.status = 127;
 		return (127);
 	}
-	if (strcmp(command[0], "env") == 0)
-		status = built_command(envp, command_no, command[0]);
 	else
-		status = built_command(command, command_no, program_name);
+		status = built_command(cmd_var);
 	return (status);
 }
 
@@ -75,13 +63,10 @@ int is_builtin(char *command)
 
 /**
  * _prompt - prompts user for commands
- * @argv: array of parsed command
- * @commands_no: command id
- * @program_name: program name
- * @envp: environment variables
+ * @cmd_var: command variables
  * Return: 0
  */
-int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
+int _prompt(cmd_t cmd_var)
 {
 	char *command = NULL;
 	size_t n = 0;
@@ -102,10 +87,10 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 				== (size_t)_strlen(command) || command[0] == '#')
 			continue;
 		/*Tokenize command*/
-		argv = tokenize(command, DELIMITER);
+		cmd_var.cmd = tokenize(command, DELIMITER);
 		/* execute the command */
-		*commands_no = *commands_no + 1;
-		status = execute(argv, program_name, *commands_no, envp);
+		cmd_var.cmd_no += 1;
+		status = execute(cmd_var);
 	}
 	free(command);
 	return (status);
@@ -121,26 +106,40 @@ int _prompt(char **argv, int *commands_no, char *program_name, char **envp)
 
 int main(int ac, char **argv, char **envp)
 {
-	int command_no = 0, status = 0;
-	char *buffer = NULL, *program_name = argv[0];
+	cmd_t cmd_var = {0};
+	char *buffer = NULL;
 	size_t n = 0;
 	FILE *stream = stdin;
 
+	cmd_var.prg_name = argv[0];
+	cmd_var.env = envp;
 	/*checks interactiveness.*/
 	if (isatty(STDIN_FILENO))
 	{
 		if (ac == 2)
 		{
-			stream = (FILE *)argv[1];
-			non_interactive(&buffer, &n, stream, program_name, envp);
+			int accs = access(argv[1], R_OK);
+
+			stream = fopen(argv[1], "r");
+			if (accs != -1 && stream != NULL)
+			{
+				cmd_var.status = non_interactive(&buffer, &n, stream, cmd_var);
+				fclose(stream);
+			}
+			else
+			{
+				dprintf(STDERR_FILENO, "%s: 0: Can't open %s\n",
+				cmd_var.prg_name, argv[1]);
+				return (127);
+			}
 		}
 		else
-			status = _prompt(argv, &command_no, program_name, envp);
+			cmd_var.status = _prompt(cmd_var);
 	}
 	/*checks non-interactive*/
 	else
 	{
-		status = non_interactive(&buffer, &n, stream, program_name, envp);
+		cmd_var.status = non_interactive(&buffer, &n, stream, cmd_var);
 	}
-	return (status);
+	return (cmd_var.status);
 }

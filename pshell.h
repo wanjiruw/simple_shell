@@ -18,6 +18,24 @@
 /* Structures */
 
 /**
+ * struct command_var - struct of command variables
+ * @cmd: command
+ * @cmd_no: command number
+ * @status: execution status
+ * @prg_name: program name
+ * @env: environment variables
+ */
+
+typedef struct command_var
+{
+	char **cmd;
+	int cmd_no;
+	int status;
+	char *prg_name;
+	char **env;
+} cmd_t;
+
+/**
  * struct builtin_t - this is a structure of funtion pointers for built
  * builtin commands
  * @cmd_n: command name of type char *
@@ -26,26 +44,26 @@
 typedef struct builtin_t
 {
 	char *cmd_n;
-	int (*cmd)(char **, int, char *);
+	int (*cmd)(cmd_t cmd_var);
 } built_t;
 
 extern char **environ;
 /*checks for command in the path*/
 char *_which(char *);
-int execut_cmd(char **, char *, int, char **);
+int execut_cmd(cmd_t);
 
 char **tokenize(char *, const char *);
 int is_builtin(char *command);
-int exec_builtin(char **command, char *, int, char **);
+int exec_builtin(cmd_t);
 
 /*Handles allocated memory*/
 void free_grid(char **);
 char *_strtok(char *, char *);
 
 /* Prototypes for builtin functions*/
-int (*get_builtin(char **))(char **, int, char *);
-int m_exit(char **, int, char *);
-int _cd(char **, int, char *);
+int (*get_builtin(char **))(cmd_t);
+int m_exit(cmd_t);
+int _cd(cmd_t);
 int _isdigit(int);
 int _atoi(char *str);
 
@@ -64,8 +82,8 @@ void join(char *, char *, char *, const char *);
 
 /*Environment Functions*/
 char *_getenv(char *var);
-int _env(char **, int, char *);
+int _env(cmd_t);
 int _setenv(const char *, const char *, int);
-int non_interactive(char **buffer, size_t *n, FILE *file, char *, char **);
-int execute(char **command, char *program_name, int command_no, char **);
+int non_interactive(char **buffer, size_t *n, FILE *file, cmd_t);
+int execute(cmd_t);
 #endif

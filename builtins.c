@@ -2,24 +2,23 @@
 
 /**
  * _cd - function to change current working directory
- * @command: dir name or dir path name
- * @command_no: command id
- * @program_name: program name
+ * @cmd_var: command variables
  * Return: status
  */
 
-int _cd(char **command, int command_no, char *program_name)
+int _cd(cmd_t cmd_var)
 {
 	int status = 0;
 	int st;
-	char *dir_name = command[1];
+	char *dir_name = cmd_var.cmd[1];
 	char buff[1024];
 
 	if (dir_name == NULL)
 		dir_name = _getenv("HOME");
 	else
 	{
-		if (_strcmp(command[1], "-") == 0)
+		/*TO BE BACK*/
+		if (_strcmp(dir_name, "-") == 0)
 		{
 			dir_name = _getenv("OLDPWD");
 			setenv("OLDPWD", (const char *)getcwd(buff, 1024), 1);
@@ -33,7 +32,8 @@ int _cd(char **command, int command_no, char *program_name)
 	if (st == -1)
 	{
 		dprintf(STDERR_FILENO, "%s: %d: cd: can't cd to %s\n",
-				program_name, command_no, dir_name);
+				cmd_var.prg_name, cmd_var.cmd_no, dir_name);
+		cmd_var.status = errno;
 		status = errno;
 		return (status);
 	}
@@ -60,45 +60,43 @@ int is_number(char *string)
 
 /**
  * m_exit - terminates a process
- * @command: command entered at CLI
- * @command_no: command id
- * @program_name: executable name
+ * @cmd_var: command variables
  * Return: status
  */
 
-int m_exit(char **command, int command_no, char *program_name)
+int m_exit(cmd_t cmd_var)
 {
-	char error_msg[] = "illegal number: ";
-	int exit_status = 0;
+	char error_msg[] = "Illegal number: ";
+	int exit_status = cmd_var.status;
 
-	if (command[1] != NULL)
+	if (cmd_var.cmd[1] != NULL)
 	{
 		/* converts string argument to integer status*/
-		if (is_number(command[1]))
+		if (is_number(cmd_var.cmd[1]))
 		{
-			exit_status = _atoi(command[1]);
+			exit_status = _atoi(cmd_var.cmd[1]);
 			if (exit_status < 0)
 			{
-				printMsg(command_no, program_name, command[0], error_msg);
-				_puts(command[1], STDERR_FILENO);
+				printMsg(cmd_var.cmd_no, cmd_var.prg_name, cmd_var.cmd[0], error_msg);
+				_puts(cmd_var.cmd[1], STDERR_FILENO);
 				_puts("\n", STDERR_FILENO);
 				return (2);
 			}
 			else
 			{
-				free_grid(command);
+				free_grid(cmd_var.cmd);
 				exit(exit_status);
 			}
 		}
 		else
 		{
-			printMsg(command_no, program_name, command[0], error_msg);
-			_puts(command[1], STDERR_FILENO);
+			printMsg(cmd_var.cmd_no, cmd_var.prg_name, cmd_var.cmd[0], error_msg);
+			_puts(cmd_var.cmd[1], STDERR_FILENO);
 			_puts("\n", STDERR_FILENO);
 			return (2);
 		}
 	}
-	free_grid(command);
+	free_grid(cmd_var.cmd);
 	exit(exit_status);
 }
 /**
