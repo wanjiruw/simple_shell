@@ -36,9 +36,9 @@ int _env(cmd_t cmd_var)
 {
 	int i = 0;
 
-	while (cmd_var.cmd[i])
+	while (cmd_var.env[i])
 	{
-		write(STDOUT_FILENO, cmd_var.cmd[i], _strlen(cmd_var.cmd[i]));
+		write(STDOUT_FILENO, cmd_var.env[i], _strlen(cmd_var.env[i]));
 		write(STDOUT_FILENO, "\n", 1);
 		i++;
 	}
